@@ -1,0 +1,4 @@
+---
+
+  es_cluster_name: es-catraca-logs
+  data_path: /data

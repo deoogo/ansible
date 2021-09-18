@@ -1,0 +1,9 @@
+---
+
+packages:
+    - libselinux-python
+    - vim
+    - htop
+    - git
+    - sysstat
+    - telnet

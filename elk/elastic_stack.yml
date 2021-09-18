@@ -1,0 +1,8 @@
+---
+  - name: Elastic Stack Installation
+    hosts: dev
+    become: yes
+
+    roles:
+      - common
+      - logstash

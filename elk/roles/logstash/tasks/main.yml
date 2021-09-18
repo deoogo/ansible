@@ -1,0 +1,45 @@
+---
+
+  - name: Remove Any Previous Versions of Java
+    yum:
+      name: java-1.7.0-openjdk
+      state: absent
+
+  - name: Install Java Version 8
+    yum:
+      name: java-1.8.0-openjdk
+
+  - name: Install Elasticsearch Repository
+    yum_repository:
+      name: elasticsearch
+      description: Elasticsearch repository for 6.x packages
+      baseurl: https://artifacts.elastic.co/packages/6.x/yum
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      gpgcheck: yes
+      enabled: yes
+
+  - name: Update YUM Packages List
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Install logstash (latest 6 version available)
+    yum:
+      name: logstash
+      state: latest
+  - name: Set logstash Configuration File
+    template:
+      src: logstash.yml.j2
+      dest: /etc/logstash/logstash.yml
+  
+  - name: Set logstash JVM File
+    template:
+      src: jvm.options.j2
+      dest: /etc/logstash/jvm.options.yml
+
+
+  - name: Start logstash service
+    service:
+      name: logstash
+      state: started
+  
