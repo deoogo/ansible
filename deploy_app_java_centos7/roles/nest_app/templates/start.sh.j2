@@ -1,0 +1,10 @@
+echo "iniciando instalação do pacote";
+
+cd /opt/app/tmp;
+BUILD_ID=dontKillMe /opt/app/tmp/script.sh \
+{{ app_client }} \
+{{ app_port }} \
+web-0.0.1-SNAPSHOT.war \
+config/application.properties "-Xms128m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m" \
+{{ app_env }} \
+web

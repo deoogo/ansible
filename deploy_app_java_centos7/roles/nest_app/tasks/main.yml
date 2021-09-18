@@ -1,0 +1,50 @@
+---
+# tasks file for name_app
+  - name: Install application dependencies
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - "{{ app_dependencies }}"
+    tags:
+      - name_app
+
+  - name: Create {{ app_group }} group
+    group:
+      name: "{{ app_group }}"
+      state: present
+    tags:
+      - name_app
+
+  - name: Create {{ app_user }} user
+    user:
+      name: "{{ app_user }}"
+      state: present
+      shell: /bin/bash
+      groups: "{{ app_group }}"
+      createhome: no
+      home: "{{ app_path }}"
+    tags:
+      - name_app
+
+  - name: Create necessary paths
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ app_user }}"
+      group: "{{ app_group }}"
+    with_items:
+      - "{{ app_default_dirs }}"
+    tags:
+      - name_app
+  - name: copy script deploy
+    template: src=script_nest.sh.j2 dest=/opt/app/tmp/script_nest.sh mode=0755
+
+  - name: copy script start app
+    template: src=start.sh.j2 dest=/opt/app/tmp/start.sh mode=0755
+
+  - name: copy script deploy
+    copy: src=/home/deoogo/.jenkins/workspace/web-0.0.1-SNAPSHOT.war dest=/opt/app/web-0.0.1-SNAPSHOT.war
+
+  - name: start app
+    shell: /opt/app/tmp/start.sh

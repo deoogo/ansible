@@ -1,0 +1,15 @@
+[Unit]
+Description={{ app name }}
+Requires=network.target eureka-server.service config-server.service
+After=network.target
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+Type=simple
+ExecStart=/usr/bin/java -jar {{ app_path }}/app/my-awesome-service-1.0.0.jar
+RestartSec=10
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

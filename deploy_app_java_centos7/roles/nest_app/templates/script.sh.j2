@@ -1,0 +1,98 @@
+#!/bin/bash
+
+echo "iniciando o script $0 "
+
+########################################
+# Variaveis de inicialização do script #
+# env = dev / aprag / tecnomad ...     #
+# port = 8080 / 8010 ..                #
+# jarFile = nest.war / mobile.jar      #
+# configFile = application.yml         #
+# javaOpts = -Xargs                    #
+########################################
+
+env=$1
+port=$2
+jarFile=$3
+configFile=$4
+javaOpts=$5
+profile=$6
+typeEnv=$7
+tmpDir=/opt/app/tmp
+envDir=/opt/app/$profile/$env/$typeEnv
+logDir=$envDir/logs
+logFile=$logDir/$env$typeEnv.log
+
+msgBuffer="Buffering: "
+msgAppStarted="Application Started... exiting buffer!"
+
+function stopServer () {
+        echo " "
+    echo "Stoping process on port: $port"
+
+        outpid=`/usr/sbin/lsof -ti :$port`;
+
+        if [  "$outpid" != "" ]; then
+                if [  "$outpid" -gt 0 ]; then
+                        kill -9 $outpid;
+                else echo "Não tem processo rodando na porta $port"; fi;
+        else echo "Não tem processo rodando na porta $port"; fi;
+
+    echo " "
+}
+
+function copyFiles() {
+        cp -R $tmpDir/* $envDir
+}
+
+function clearDir() {
+        rm -Rf $1/*
+}
+
+function createDirDeploy () {
+        if [ ! -d "$1" ]; then
+                echo "Diretorio $1 não encontrado. Criando diretorio $1"
+          mkdir -p $1
+          chmod -R 777 $1
+        fi;
+}
+
+function startServer() {
+        cd $envDir
+        nohup java -Dspring.config.location=file:$configFile -Dserver.port=$port -Dspring.profiles.active=$profile $javaOpts  -jar $jarFile  >> $logFile 2>&1 & echo $! > $profile.pid
+
+        echo "executando comando: nohup java -Dspring.config.location=file:$configFile -Dserver.port=$port -Dspring.profiles.active=$profile $javaOpts  -jar $jarFile  > $logFile 2>&1 & echo $! > $profile.pid"
+
+}
+
+
+function watch(){
+
+    tail -f $logFile |
+
+        while IFS= read line
+            do
+                echo "$msgBuffer" "$line"
+
+                if [[ "$line" == *"$whatToFind"* ]]; then
+                    echo $msgAppStarted
+                    pkill  tail
+                fi
+        done
+}
+
+stopServer
+
+createDirDeploy $envDir
+
+clearDir $envDir
+
+createDirDeploy $logDir
+
+copyFiles
+
+startServer
+
+watch
+
+clearDir $tmpDir

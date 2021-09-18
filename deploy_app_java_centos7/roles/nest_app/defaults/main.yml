@@ -1,0 +1,19 @@
+---
+# defaults file for name_app
+
+
+app_client: "xx"
+app_env: "prd"
+app_port: "xx"
+app_user: "nest"
+app_group: "{{ app_user }}"
+
+app_path: /opt
+app_default_dirs:
+  - "{{ app_path }}/app"
+  - "{{ app_path }}/logs"
+  - "{{ app_path }}/config"
+  - "{{ app_path }}/shared"
+  - "{{ app_path }}/app/tmp"
+app_dependencies:
+  - java-1.8.0-openjdk

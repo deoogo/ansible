@@ -1,0 +1,10 @@
+---
+# tasks file for Nest
+#  - hosts: nest-autonest-prd
+  - hosts: all
+#    remote_user: root
+    user: root
+#    gather_facts: false
+    become: True
+    roles:
+      - name_app
